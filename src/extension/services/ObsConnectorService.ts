@@ -1,5 +1,5 @@
 import type { NodeCG, ReplicantServer } from 'nodecg/server';
-import { ObsCredentials, ObsData } from '../../types/schemas';
+import { ObsCredentials, ObsState } from '../../types/schemas';
 import OBSWebSocket, { EventTypes } from 'obs-websocket-js';
 import { ObsStatus } from '../../types/enums/ObsStatus';
 import { isBlank } from '../../helpers/stringHelper';
@@ -9,7 +9,7 @@ const SOCKET_CLOSURE_CODES_FORBIDDING_RECONNECTION = [4009, 4010, 4011];
 
 export class ObsConnectorService {
     private readonly nodecg: NodeCG;
-    private obsData: ReplicantServer<ObsData>;
+    private obsState: ReplicantServer<ObsState>;
     private obsCredentials: ReplicantServer<ObsCredentials>;
     private socket: OBSWebSocket;
     private reconnectionInterval: NodeJS.Timeout;
@@ -17,7 +17,7 @@ export class ObsConnectorService {
 
     constructor(nodecg: NodeCG) {
         this.nodecg = nodecg;
-        this.obsData = nodecg.Replicant('obsData');
+        this.obsState = nodecg.Replicant('obsState');
         this.obsCredentials = nodecg.Replicant('obsCredentials');
         this.socket = new OBSWebSocket();
         this.reconnectionCount = 0;
@@ -27,7 +27,7 @@ export class ObsConnectorService {
         this.socket.on('SceneListChanged', e => this.handleSceneListChange(e));
         this.socket.on('CurrentProgramSceneChanged', e => this.handleProgramSceneChange(e));
 
-        if (this.obsData.value.enabled) {
+        if (this.obsState.value.enabled) {
             this.connect().catch(() => {
                 // ignore
             });
@@ -35,12 +35,12 @@ export class ObsConnectorService {
     }
 
     private handleClosure(event: EventTypes['ConnectionClosed']): void {
-        if (this.obsData.value.status === ObsStatus.CONNECTED) {
+        if (this.obsState.value.status === ObsStatus.CONNECTED) {
             if (event.code !== 1000) {
                 this.nodecg.log.error('OBS websocket closed with message:', event.message);
             }
-            this.obsData.value.status = ObsStatus.NOT_CONNECTED;
-            if (this.obsData.value.enabled) {
+            this.obsState.value.status = ObsStatus.NOT_CONNECTED;
+            if (this.obsState.value.enabled) {
                 this.startReconnecting(event.code);
             }
         }
@@ -48,7 +48,7 @@ export class ObsConnectorService {
 
     private handleOpening(): void {
         this.nodecg.log.info('OBS websocket is open.');
-        this.obsData.value.status = ObsStatus.CONNECTED;
+        this.obsState.value.status = ObsStatus.CONNECTED;
         this.stopReconnecting();
     }
 
@@ -57,12 +57,12 @@ export class ObsConnectorService {
     }
 
     private handleProgramSceneChange(event: EventTypes['CurrentProgramSceneChanged']): void {
-        this.obsData.value.currentScene = event.sceneName;
+        this.obsState.value.currentScene = event.sceneName;
     }
 
     async connect(reconnectOnFailure = true): Promise<void> {
         await this.socket.disconnect();
-        this.obsData.value.status = ObsStatus.CONNECTING;
+        this.obsState.value.status = ObsStatus.CONNECTING;
 
         try {
             // todo: if address does not start with http(s), add it manually (client side?)
@@ -70,7 +70,7 @@ export class ObsConnectorService {
                 this.obsCredentials.value.address,
                 isBlank(this.obsCredentials.value.password) ? undefined : this.obsCredentials.value.password);
         } catch (e) {
-            this.obsData.value.status = ObsStatus.NOT_CONNECTED;
+            this.obsState.value.status = ObsStatus.NOT_CONNECTED;
             if (reconnectOnFailure) {
                 this.startReconnecting(e.code);
             }
@@ -88,7 +88,7 @@ export class ObsConnectorService {
     private async loadSceneList(): Promise<void> {
         const scenes = await this.socket.call('GetSceneList');
 
-        this.obsData.value.currentScene = scenes.currentProgramSceneName;
+        this.obsState.value.currentScene = scenes.currentProgramSceneName;
         this.updateScenes(scenes.scenes.map(scene => String(scene.sceneName)));
     }
 
@@ -118,20 +118,20 @@ export class ObsConnectorService {
             return;
         }
 
-        const obsDataUpdates: Record<string, unknown> = {};
-        if (!scenes.includes(this.obsData.value.gameplayScene)) {
-            obsDataUpdates.gameplayScene = scenes[0];
+        const obsStateUpdates: Record<string, unknown> = {};
+        if (!scenes.includes(this.obsState.value.gameplayScene)) {
+            obsStateUpdates.gameplayScene = scenes[0];
         }
-        if (!scenes.includes(this.obsData.value.intermissionScene)) {
-            obsDataUpdates.intermissionScene = scenes[scenes.length === 1 ? 0 : 1];
+        if (!scenes.includes(this.obsState.value.intermissionScene)) {
+            obsStateUpdates.intermissionScene = scenes[scenes.length === 1 ? 0 : 1];
         }
-        obsDataUpdates.scenes = scenes;
-        this.obsData.value = {
-            ...this.obsData.value,
-            ...obsDataUpdates
+        obsStateUpdates.scenes = scenes;
+        this.obsState.value = {
+            ...this.obsState.value,
+            ...obsStateUpdates
         };
 
-        if (obsDataUpdates.gameplayScene || obsDataUpdates.intermissionScene) {
+        if (obsStateUpdates.gameplayScene || obsStateUpdates.intermissionScene) {
             this.nodecg.sendMessage('obsSceneConfigurationChangedAfterUpdate');
         }
     }

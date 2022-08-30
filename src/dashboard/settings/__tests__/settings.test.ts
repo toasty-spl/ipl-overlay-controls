@@ -21,7 +21,7 @@ describe('Settings', () => {
 
         useObsStore().$state = {
             // @ts-ignore
-            obsData: {
+            obsState: {
                 enabled: true
             }
         };
@@ -44,7 +44,7 @@ describe('Settings', () => {
 
     it('matches snapshot when OBS socket is disabled', async () => {
         const obsStore = useObsStore();
-        obsStore.obsData.enabled = false;
+        obsStore.obsState.enabled = false;
         const wrapper = mount(Settings, {
             global: {
                 plugins: [pinia]

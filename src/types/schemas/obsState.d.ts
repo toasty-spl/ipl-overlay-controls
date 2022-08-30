@@ -5,7 +5,7 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export interface ObsData {
+export interface ObsState {
 	enabled: boolean;
 	status: 'CONNECTED' | 'CONNECTING' | 'NOT_CONNECTED';
 	scenes?: string[];

@@ -4,7 +4,7 @@
  */
 
 import type { NodeCG, ReplicantServer } from 'nodecg/server';
-import { GameAutomationData, ObsData, RuntimeConfig, ScoreboardData } from '../../types/schemas';
+import { GameAutomationData, ObsState, RuntimeConfig, ScoreboardData } from '../../types/schemas';
 import { GameVersion } from '../../types/enums/gameVersion';
 import { GameAutomationAction } from '../../types/enums/GameAutomationAction';
 import { switchToNextColor } from '../replicants/activeRound';
@@ -51,7 +51,7 @@ const endTimings: Record<GameVersion, GameEndTimings> = {
 
 export class AutomationActionService {
     private nodecg: NodeCG;
-    private obsData: ReplicantServer<ObsData>;
+    private obsState: ReplicantServer<ObsState>;
     private scoreboardData: ReplicantServer<ScoreboardData>;
     private runtimeConfig: ReplicantServer<RuntimeConfig>;
     private gameAutomationData: ReplicantServer<GameAutomationData>;
@@ -61,7 +61,7 @@ export class AutomationActionService {
 
     constructor(nodecg: NodeCG, obsConnectorService: ObsConnectorService) {
         this.nodecg = nodecg;
-        this.obsData = nodecg.Replicant<ObsData>('obsData');
+        this.obsState = nodecg.Replicant<ObsState>('obsState');
         this.scoreboardData = nodecg.Replicant<ScoreboardData>('scoreboardData');
         this.runtimeConfig = nodecg.Replicant<RuntimeConfig>('runtimeConfig');
         this.gameAutomationData = nodecg.Replicant<GameAutomationData>('gameAutomationData');
@@ -79,7 +79,7 @@ export class AutomationActionService {
                         name: 'changeScene',
                         action: async () => {
                             switchToNextColor();
-                            await this.obsConnectorService.setCurrentScene(this.obsData.value.gameplayScene);
+                            await this.obsConnectorService.setCurrentScene(this.obsState.value.gameplayScene);
                         }
                     },
                     {
@@ -110,7 +110,7 @@ export class AutomationActionService {
                         timeout: endTimings[gameVersion].changeScene,
                         name: 'changeScene',
                         action: async () => {
-                            await this.obsConnectorService.setCurrentScene(this.obsData.value.intermissionScene);
+                            await this.obsConnectorService.setCurrentScene(this.obsState.value.intermissionScene);
                         }
                     }
                 ];

@@ -2,7 +2,7 @@ import { ObsConnectorService } from '../ObsConnectorService';
 import { mockNodecg, replicants } from '../../__mocks__/mockNodecg';
 import OBSWebSocket, { OBSWebSocketError } from 'obs-websocket-js';
 import { ObsStatus } from '../../../types/enums/ObsStatus';
-import { ObsData } from '../../../types/schemas';
+import { ObsState } from '../../../types/schemas';
 import { flushPromises } from '@vue/test-utils';
 
 describe('ObsConnectorService', () => {
@@ -11,7 +11,7 @@ describe('ObsConnectorService', () => {
         jest.spyOn(OBSWebSocket.prototype, 'connect').mockResolvedValue(null);
         jest.spyOn(OBSWebSocket.prototype, 'disconnect').mockResolvedValue(null);
         jest.spyOn(OBSWebSocket.prototype, 'call').mockResolvedValue(null);
-        replicants.obsData = {
+        replicants.obsState = {
             enabled: false
         };
         replicants.obsCredentials = {
@@ -28,7 +28,7 @@ describe('ObsConnectorService', () => {
     describe('constructor', () => {
         it('does not attempt connection if obs is not enabled', () => {
             jest.spyOn(ObsConnectorService.prototype, 'connect');
-            replicants.obsData = {
+            replicants.obsState = {
                 enabled: false
             };
 
@@ -39,7 +39,7 @@ describe('ObsConnectorService', () => {
 
         it('connects to OBS if integration is enabled', async () => {
             jest.spyOn(ObsConnectorService.prototype, 'connect').mockResolvedValue(null);
-            replicants.obsData = {
+            replicants.obsState = {
                 enabled: true
             };
             replicants.obsCredentials = {
@@ -55,7 +55,7 @@ describe('ObsConnectorService', () => {
 
     describe('handleClosure', () => {
         it('updates obs status and does not try to reconnect if obs is disabled', () => {
-            replicants.obsData = {
+            replicants.obsState = {
                 enabled: false,
                 status: ObsStatus.CONNECTED
             };
@@ -64,7 +64,7 @@ describe('ObsConnectorService', () => {
 
             service['handleClosure'](new OBSWebSocketError(9999, 'message'));
 
-            expect(replicants.obsData).toEqual({
+            expect(replicants.obsState).toEqual({
                 enabled: false,
                 status: ObsStatus.NOT_CONNECTED
             });
@@ -72,7 +72,7 @@ describe('ObsConnectorService', () => {
         });
 
         it('updates obs status and tries to reconnect if obs is enabled', () => {
-            replicants.obsData = {
+            replicants.obsState = {
                 enabled: true,
                 status: ObsStatus.CONNECTED
             };
@@ -81,7 +81,7 @@ describe('ObsConnectorService', () => {
 
             service['handleClosure'](new OBSWebSocketError(9999, 'message'));
 
-            expect(replicants.obsData).toEqual({
+            expect(replicants.obsState).toEqual({
                 enabled: true,
                 status: ObsStatus.NOT_CONNECTED
             });
@@ -92,7 +92,7 @@ describe('ObsConnectorService', () => {
             ObsStatus.CONNECTING,
             ObsStatus.NOT_CONNECTED
         ])('does nothing if obs status is %s', status => {
-            replicants.obsData = {
+            replicants.obsState = {
                 enabled: true,
                 status
             };
@@ -101,7 +101,7 @@ describe('ObsConnectorService', () => {
 
             service['handleClosure'](new OBSWebSocketError(9999, 'message'));
 
-            expect(replicants.obsData).toEqual({
+            expect(replicants.obsState).toEqual({
                 enabled: true,
                 status
             });
@@ -117,7 +117,7 @@ describe('ObsConnectorService', () => {
             service['handleOpening']();
 
             expect(service.stopReconnecting).toHaveBeenCalled();
-            expect(replicants.obsData).toEqual({
+            expect(replicants.obsState).toEqual({
                 enabled: false,
                 status: ObsStatus.CONNECTED
             });
@@ -145,7 +145,7 @@ describe('ObsConnectorService', () => {
                 sceneName: 'new-scene'
             });
 
-            expect(replicants.obsData).toEqual({
+            expect(replicants.obsState).toEqual({
                 enabled: false,
                 currentScene: 'new-scene'
             });
@@ -163,7 +163,7 @@ describe('ObsConnectorService', () => {
 
             await service.connect();
 
-            expect(replicants.obsData).toEqual({ enabled: false, status: ObsStatus.CONNECTING });
+            expect(replicants.obsState).toEqual({ enabled: false, status: ObsStatus.CONNECTING });
             expect(OBSWebSocket.prototype.disconnect).toHaveBeenCalled();
             expect(OBSWebSocket.prototype.connect).toHaveBeenCalledWith('wss://obs-socket', 'test pwd');
             expect(service['loadSceneList']).toHaveBeenCalled();
@@ -183,7 +183,7 @@ describe('ObsConnectorService', () => {
 
             await expect(() => service.connect()).rejects.toThrow(new Error('Failed to connect to OBS: test error'));
 
-            expect(replicants.obsData).toEqual({ enabled: false, status: ObsStatus.NOT_CONNECTED });
+            expect(replicants.obsState).toEqual({ enabled: false, status: ObsStatus.NOT_CONNECTED });
             expect(OBSWebSocket.prototype.disconnect).toHaveBeenCalled();
             expect(OBSWebSocket.prototype.connect).toHaveBeenCalledWith('wss://obs-socket', 'test pwd');
             expect(service.startReconnecting).toHaveBeenCalledWith(10000);
@@ -203,7 +203,7 @@ describe('ObsConnectorService', () => {
             await expect(() => service.connect(false))
                 .rejects.toThrow(new Error('Failed to connect to OBS: test error'));
 
-            expect(replicants.obsData).toEqual({ enabled: false, status: ObsStatus.NOT_CONNECTED });
+            expect(replicants.obsState).toEqual({ enabled: false, status: ObsStatus.NOT_CONNECTED });
             expect(OBSWebSocket.prototype.disconnect).toHaveBeenCalled();
             expect(OBSWebSocket.prototype.connect).toHaveBeenCalledWith('wss://obs-socket', 'test pwd');
             expect(service.startReconnecting).not.toHaveBeenCalled();
@@ -239,7 +239,7 @@ describe('ObsConnectorService', () => {
             await service['loadSceneList']();
 
             expect(OBSWebSocket.prototype.call).toHaveBeenCalledWith('GetSceneList');
-            expect((replicants.obsData as ObsData).currentScene).toEqual('scene1');
+            expect((replicants.obsState as ObsState).currentScene).toEqual('scene1');
             expect(service['updateScenes']).toHaveBeenCalledWith(['scene1', 'scene2', 'scene3']);
         });
     });
@@ -302,7 +302,7 @@ describe('ObsConnectorService', () => {
 
     describe('updateScenes', () => {
         it('does nothing if an empty list is provided', () => {
-            replicants.obsData = {
+            replicants.obsState = {
                 gameplayScene: 'gameplay',
                 intermissionScene: 'intermission'
             };
@@ -310,7 +310,7 @@ describe('ObsConnectorService', () => {
 
             service['updateScenes']([]);
 
-            expect(replicants.obsData).toEqual({
+            expect(replicants.obsState).toEqual({
                 gameplayScene: 'gameplay',
                 intermissionScene: 'intermission'
             });
@@ -318,7 +318,7 @@ describe('ObsConnectorService', () => {
         });
 
         it('updates the gameplay scene and sends a message if the gameplay scene is no longer found', () => {
-            replicants.obsData = {
+            replicants.obsState = {
                 gameplayScene: 'gameplay',
                 intermissionScene: 'intermission'
             };
@@ -329,7 +329,7 @@ describe('ObsConnectorService', () => {
                 'intermission'
             ]);
 
-            expect(replicants.obsData).toEqual({
+            expect(replicants.obsState).toEqual({
                 gameplayScene: 'scene1',
                 intermissionScene: 'intermission',
                 scenes: [
@@ -341,7 +341,7 @@ describe('ObsConnectorService', () => {
         });
 
         it('updates the intermission scene and sends a message if the intermission scene is no longer found', () => {
-            replicants.obsData = {
+            replicants.obsState = {
                 gameplayScene: 'gameplay',
                 intermissionScene: 'intermission'
             };
@@ -352,7 +352,7 @@ describe('ObsConnectorService', () => {
                 'scene2'
             ]);
 
-            expect(replicants.obsData).toEqual({
+            expect(replicants.obsState).toEqual({
                 gameplayScene: 'gameplay',
                 intermissionScene: 'scene2',
                 scenes: [
@@ -364,7 +364,7 @@ describe('ObsConnectorService', () => {
         });
 
         it('updates the list of scenes', () => {
-            replicants.obsData = {
+            replicants.obsState = {
                 gameplayScene: 'gameplay',
                 intermissionScene: 'intermission',
                 scenes: [
@@ -380,7 +380,7 @@ describe('ObsConnectorService', () => {
                 'new scene'
             ]);
 
-            expect(replicants.obsData).toEqual({
+            expect(replicants.obsState).toEqual({
                 gameplayScene: 'gameplay',
                 intermissionScene: 'intermission',
                 scenes: [

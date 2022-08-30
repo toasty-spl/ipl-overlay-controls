@@ -50,11 +50,11 @@ export default defineComponent({
         const intermissionScene = ref('');
 
         watch(
-            () => obsStore.obsData.gameplayScene,
+            () => obsStore.obsState.gameplayScene,
             scene => gameplayScene.value = scene,
             { immediate: true });
         watch(
-            () => obsStore.obsData.intermissionScene,
+            () => obsStore.obsState.intermissionScene,
             scene => intermissionScene.value = scene,
             { immediate: true });
 
@@ -62,12 +62,12 @@ export default defineComponent({
             RIGHT_CLICK_UNDO_MESSAGE,
             gameplayScene,
             intermissionScene,
-            hasObsData: computed(() => obsStore.obsData.scenes != null),
-            sceneOptions: computed(() => obsStore.obsData.scenes?.map(scene =>
+            hasObsData: computed(() => obsStore.obsState.scenes != null),
+            sceneOptions: computed(() => obsStore.obsState.scenes?.map(scene =>
                 ({ value: scene, name: scene })) ?? []),
             isChanged: computed(() =>
-                gameplayScene.value !== obsStore.obsData.gameplayScene
-                || intermissionScene.value !== obsStore.obsData.intermissionScene),
+                gameplayScene.value !== obsStore.obsState.gameplayScene
+                || intermissionScene.value !== obsStore.obsState.intermissionScene),
             update() {
                 obsStore.setData({
                     gameplayScene: gameplayScene.value,
@@ -77,8 +77,8 @@ export default defineComponent({
             undoChanges(event: Event) {
                 event.preventDefault();
 
-                gameplayScene.value = obsStore.obsData.gameplayScene;
-                intermissionScene.value = obsStore.obsData.intermissionScene;
+                gameplayScene.value = obsStore.obsState.gameplayScene;
+                intermissionScene.value = obsStore.obsState.intermissionScene;
             }
         };
     }

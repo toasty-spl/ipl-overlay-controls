@@ -18,7 +18,7 @@ describe('ObsDataPicker', () => {
 
         const obsStore = useObsStore();
         obsStore.obsCredentials = null;
-        obsStore.obsData = {
+        obsStore.obsState = {
             enabled: true,
             status: ObsStatus.CONNECTED,
             scenes: ['Scene One', 'Scene Two', 'Scene Three'],
@@ -39,7 +39,7 @@ describe('ObsDataPicker', () => {
 
     it('matches snapshot without scene data', () => {
         const store = useObsStore();
-        store.obsData.scenes = null;
+        store.obsState.scenes = null;
         const wrapper = mount(ObsDataPicker, {
             global: {
                 plugins: [pinia]

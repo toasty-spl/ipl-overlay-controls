@@ -33,7 +33,7 @@ describe('MatchManager', () => {
 
         useObsStore().$state = {
             // @ts-ignore
-            obsData: {
+            obsState: {
                 status: ObsStatus.CONNECTED
             }
         };
@@ -41,7 +41,7 @@ describe('MatchManager', () => {
 
     it.each(Object.values(ObsStatus))('matches snapshot if obs status is %s', status => {
         const obsStore = useObsStore();
-        obsStore.obsData.status = status;
+        obsStore.obsState.status = status;
         const wrapper = mount(MatchManager);
 
         expect(wrapper.html()).toMatchSnapshot();
@@ -138,8 +138,8 @@ describe('MatchManager', () => {
             obsStore.gameAutomationData = {
                 actionInProgress: GameAutomationAction.NONE
             };
-            obsStore.obsData.currentScene = 'Gameplay Scene';
-            obsStore.obsData.gameplayScene = 'Gameplay Scene';
+            obsStore.obsState.currentScene = 'Gameplay Scene';
+            obsStore.obsState.gameplayScene = 'Gameplay Scene';
             wrapper = mount(MatchManager);
         });
 
@@ -169,8 +169,8 @@ describe('MatchManager', () => {
             obsStore.gameAutomationData = {
                 actionInProgress: GameAutomationAction.NONE
             };
-            obsStore.obsData.currentScene = 'another scene';
-            obsStore.obsData.gameplayScene = 'Gameplay Scene';
+            obsStore.obsState.currentScene = 'another scene';
+            obsStore.obsState.gameplayScene = 'Gameplay Scene';
             wrapper = mount(MatchManager);
         });
 
@@ -225,8 +225,8 @@ describe('MatchManager', () => {
 
     it('shows warning if obs scene configuration is changed', async () => {
         const obsStore = useObsStore();
-        obsStore.obsData.gameplayScene = 'Gameplay Scene';
-        obsStore.obsData.intermissionScene = 'Intermission Scene';
+        obsStore.obsState.gameplayScene = 'Gameplay Scene';
+        obsStore.obsState.intermissionScene = 'Intermission Scene';
         const wrapper = mount(MatchManager);
 
         messageListeners.obsSceneConfigurationChangedAfterUpdate();

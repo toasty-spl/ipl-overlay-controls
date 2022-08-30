@@ -126,7 +126,7 @@ export default defineComponent({
         const actionInProgress = computed(() =>
             obsStore.gameAutomationData?.actionInProgress !== GameAutomationAction.NONE
             && !isBlank(obsStore.gameAutomationData?.nextTaskForAction?.name));
-        const gameplaySceneActive = computed(() => obsStore.obsData.gameplayScene === obsStore.obsData.currentScene);
+        const gameplaySceneActive = computed(() => obsStore.obsState.gameplayScene === obsStore.obsState.currentScene);
 
         const now = ref(new Date().getTime());
         const setCurrentTimeInterval = setInterval(() => {
@@ -144,7 +144,7 @@ export default defineComponent({
 
         return {
             disableShowCasters,
-            isObsConnected: computed(() => obsStore.obsData.status === ObsStatus.CONNECTED),
+            isObsConnected: computed(() => obsStore.obsState.status === ObsStatus.CONNECTED),
             showCasters() {
                 casterStore.showCasters();
             },
@@ -188,8 +188,8 @@ export default defineComponent({
                     && obsStore.gameAutomationData?.nextTaskForAction?.executionTimeMillis - 1000 < now.value;
             }),
 
-            gameplayScene: computed(() => obsStore.obsData.gameplayScene),
-            intermissionScene: computed(() => obsStore.obsData.intermissionScene),
+            gameplayScene: computed(() => obsStore.obsState.gameplayScene),
+            intermissionScene: computed(() => obsStore.obsState.intermissionScene),
             showObsConfigurationChangedWarning
         };
     }

@@ -1,23 +1,23 @@
 import { NodeCGBrowser } from 'nodecg/browser';
-import { GameAutomationData, ObsCredentials, ObsData } from 'schemas';
+import { GameAutomationData, ObsCredentials, ObsState } from 'schemas';
 import { SetObsDataRequest } from 'types/messages/obs';
 import { defineStore } from 'pinia';
 
-const obsData = nodecg.Replicant<ObsData>('obsData');
+const obsState = nodecg.Replicant<ObsState>('obsState');
 const obsCredentials = nodecg.Replicant<ObsCredentials>('obsCredentials');
 const gameAutomationData = nodecg.Replicant<GameAutomationData>('gameAutomationData');
 
-export const obsReps = [obsData, obsCredentials, gameAutomationData];
+export const obsReps = [obsState, obsCredentials, gameAutomationData];
 
 export interface ObsStore {
-    obsData: ObsData
+    obsState: ObsState
     obsCredentials: ObsCredentials
     gameAutomationData: GameAutomationData
 }
 
 export const useObsStore = defineStore('obs', {
     state: () => ({
-        obsData: null,
+        obsState: null,
         obsCredentials: null,
         gameAutomationData: null
     } as ObsStore),

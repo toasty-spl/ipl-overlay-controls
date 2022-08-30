@@ -82,7 +82,7 @@ export default defineComponent({
 
         const socketEnabled = computed({
             get() {
-                return obsStore.obsData.enabled;
+                return obsStore.obsState.enabled;
             },
             async set(value: boolean): Promise<void> {
                 try {
@@ -117,8 +117,8 @@ export default defineComponent({
                 socketUrl.value !== obsStore.obsCredentials.address
                 || socketPassword.value !== obsStore.obsCredentials.password),
             allValid: computed(() => allValid(validators)),
-            statusText: computed(() => ObsStatusHelper.toPrettyString(obsStore.obsData.status as ObsStatus)),
-            status: computed(() => obsStore.obsData.status),
+            statusText: computed(() => ObsStatusHelper.toPrettyString(obsStore.obsState.status as ObsStatus)),
+            status: computed(() => obsStore.obsState.status),
             connect() {
                 return obsStore.connect({ address: socketUrl.value, password: socketPassword.value });
             },

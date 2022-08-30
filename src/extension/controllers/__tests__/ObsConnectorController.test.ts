@@ -14,7 +14,7 @@ describe('ObsConnectorController', () => {
 
     describe('connectToObs', () => {
         it('re-assigns credentials and throws an error if obs integration is disabled', async () => {
-            replicants.obsData = {
+            replicants.obsState = {
                 enabled: false
             };
 
@@ -32,7 +32,7 @@ describe('ObsConnectorController', () => {
         });
 
         it('connects to OBS if integration is enabled', async () => {
-            replicants.obsData = {
+            replicants.obsState = {
                 enabled: true
             };
 
@@ -55,7 +55,7 @@ describe('ObsConnectorController', () => {
             ['scene1', 'scene3'],
             ['scene3', 'scene1']
         ])('throws an error if the gameplay scene is not found (%#)', (gameplayScene, intermissionScene) => {
-            replicants.obsData = {
+            replicants.obsState = {
                 scenes: ['scene1', 'scene2']
             };
 
@@ -64,14 +64,14 @@ describe('ObsConnectorController', () => {
         });
 
         it('re-assigns the gameplay and intermission scenes', () => {
-            replicants.obsData = {
+            replicants.obsState = {
                 enabled: true,
                 scenes: ['scene1', 'scene2', 'scene3']
             };
 
             controllerListeners.setObsData({ gameplayScene: 'scene2', intermissionScene: 'scene3' });
 
-            expect(replicants.obsData).toEqual({
+            expect(replicants.obsState).toEqual({
                 enabled: true,
                 scenes: ['scene1', 'scene2', 'scene3'],
                 gameplayScene: 'scene2',
@@ -89,11 +89,11 @@ describe('ObsConnectorController', () => {
         });
 
         it('disconnects from obs when disabling the socket', async () => {
-            replicants.obsData = {};
+            replicants.obsState = {};
 
             await controllerListeners.setObsSocketEnabled(false);
 
-            expect(replicants.obsData).toEqual({
+            expect(replicants.obsState).toEqual({
                 enabled: false
             });
             expect(obsConnectorService.disconnect).toHaveBeenCalled();
@@ -101,11 +101,11 @@ describe('ObsConnectorController', () => {
         });
 
         it('connects to obs when enabling the socket', async () => {
-            replicants.obsData = {};
+            replicants.obsState = {};
 
             await controllerListeners.setObsSocketEnabled(true);
 
-            expect(replicants.obsData).toEqual({
+            expect(replicants.obsState).toEqual({
                 enabled: true
             });
             expect(obsConnectorService.connect).toHaveBeenCalled();
