@@ -24,7 +24,7 @@ describe('obsStore', () => {
             // @ts-ignore
             store.setData({ address: '192.168.1.2' });
 
-            expect(mockSendMessage).toHaveBeenCalledWith('setObsData', { address: '192.168.1.2' });
+            expect(mockSendMessage).toHaveBeenCalledWith('setObsConfig', { address: '192.168.1.2' });
         });
     });
 

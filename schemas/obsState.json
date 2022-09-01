@@ -19,10 +19,7 @@
         "currentScene": {
             "type": "string"
         },
-        "gameplayScene": {
-            "type": "string"
-        },
-        "intermissionScene": {
+        "currentSceneCollection": {
             "type": "string"
         }
     },

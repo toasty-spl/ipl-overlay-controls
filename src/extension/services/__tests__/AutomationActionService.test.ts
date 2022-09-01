@@ -41,12 +41,12 @@ describe('AutomationActionService', () => {
         });
 
         it('returns expected actions for starting a game', async () => {
-            replicants.obsState = {
-                gameplayScene: 'gameplay scene'
-            };
             replicants.scoreboardData = {
                 isVisible: false
             };
+            (obsConnectorService.getCurrentSceneConfig as jest.Mock).mockReturnValue({
+                gameplayScene: 'gameplay scene'
+            });
             const service = new AutomationActionService(mockNodecg, obsConnectorService);
 
             const result = service['getAutomationTasks'](GameAutomationAction.START_GAME);
@@ -68,9 +68,9 @@ describe('AutomationActionService', () => {
         });
 
         it('returns expected actions for ending a game', async () => {
-            replicants.obsState = {
+            (obsConnectorService.getCurrentSceneConfig as jest.Mock).mockReturnValue({
                 intermissionScene: 'intermission scene'
-            };
+            });
             replicants.scoreboardData = {
                 isVisible: true
             };

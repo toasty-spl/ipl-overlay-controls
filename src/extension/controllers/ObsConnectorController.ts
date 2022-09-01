@@ -21,17 +21,11 @@ export class ObsConnectorController extends BaseController {
             await obsConnectorService.connect();
         });
 
-        this.listen('setObsData', data => {
-            if (!obsState.value.scenes?.some(scene => scene === data.gameplayScene)
-                || !obsState.value.scenes?.some(scene => scene === data.intermissionScene)) {
-                throw new Error('Could not find one or more of the provided scenes.');
-            }
-
-            obsState.value = {
-                ...obsState.value,
-                gameplayScene: data.gameplayScene,
-                intermissionScene: data.intermissionScene
-            };
+        this.listen('setObsConfig', data => {
+            obsConnectorService.updateSceneConfig({
+                intermissionScene: data.intermissionScene,
+                gameplayScene: data.gameplayScene
+            });
         });
 
         this.listen('setObsSocketEnabled', async (enabled) => {

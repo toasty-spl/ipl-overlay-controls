@@ -50,33 +50,12 @@ describe('ObsConnectorController', () => {
         });
     });
 
-    describe('setObsData', () => {
-        it.each([
-            ['scene1', 'scene3'],
-            ['scene3', 'scene1']
-        ])('throws an error if the gameplay scene is not found (%#)', (gameplayScene, intermissionScene) => {
-            replicants.obsState = {
-                scenes: ['scene1', 'scene2']
-            };
-
-            expect(() => controllerListeners.setObsData({ gameplayScene, intermissionScene }))
-                .toThrow(new Error('Could not find one or more of the provided scenes.'));
-        });
-
+    describe('setObsConfig', () => {
         it('re-assigns the gameplay and intermission scenes', () => {
-            replicants.obsState = {
-                enabled: true,
-                scenes: ['scene1', 'scene2', 'scene3']
-            };
+            controllerListeners.setObsConfig({ gameplayScene: 'scene2', intermissionScene: 'scene3' });
 
-            controllerListeners.setObsData({ gameplayScene: 'scene2', intermissionScene: 'scene3' });
-
-            expect(replicants.obsState).toEqual({
-                enabled: true,
-                scenes: ['scene1', 'scene2', 'scene3'],
-                gameplayScene: 'scene2',
-                intermissionScene: 'scene3'
-            });
+            expect(obsConnectorService.updateSceneConfig)
+                .toHaveBeenCalledWith({ gameplayScene: 'scene2', intermissionScene: 'scene3' });
         });
     });
 

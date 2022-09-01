@@ -15,6 +15,7 @@ export * from './nextRound';
 export * from './nextRoundStartTime';
 export * from './nowPlaying';
 export * from './nowPlayingSource';
+export * from './obsConfig';
 export * from './obsCredentials';
 export * from './obsState';
 export * from './predictionStore';

@@ -126,7 +126,8 @@ export default defineComponent({
         const actionInProgress = computed(() =>
             obsStore.gameAutomationData?.actionInProgress !== GameAutomationAction.NONE
             && !isBlank(obsStore.gameAutomationData?.nextTaskForAction?.name));
-        const gameplaySceneActive = computed(() => obsStore.obsState.gameplayScene === obsStore.obsState.currentScene);
+        const gameplaySceneActive = computed(() =>
+            obsStore.currentSceneConfig.gameplayScene === obsStore.obsState.currentScene);
 
         const now = ref(new Date().getTime());
         const setCurrentTimeInterval = setInterval(() => {
@@ -188,8 +189,8 @@ export default defineComponent({
                     && obsStore.gameAutomationData?.nextTaskForAction?.executionTimeMillis - 1000 < now.value;
             }),
 
-            gameplayScene: computed(() => obsStore.obsState.gameplayScene),
-            intermissionScene: computed(() => obsStore.obsState.intermissionScene),
+            gameplayScene: computed(() => obsStore.currentSceneConfig.gameplayScene),
+            intermissionScene: computed(() => obsStore.currentSceneConfig.intermissionScene),
             showObsConfigurationChangedWarning
         };
     }

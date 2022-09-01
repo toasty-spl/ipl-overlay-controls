@@ -31,11 +31,21 @@ describe('MatchManager', () => {
 
         config.global.plugins = [pinia];
 
+        // @ts-ignore
         useObsStore().$state = {
-            // @ts-ignore
             obsState: {
-                status: ObsStatus.CONNECTED
-            }
+                enabled: true,
+                status: ObsStatus.CONNECTED,
+                scenes: ['Scene One', 'Scene Two', 'Scene Three'],
+                currentSceneCollection: 'scenes'
+            },
+            obsConfig: [
+                {
+                    sceneCollection: 'scenes',
+                    gameplayScene: 'Scene One',
+                    intermissionScene: 'Scene Two'
+                }
+            ]
         };
     });
 
@@ -139,7 +149,7 @@ describe('MatchManager', () => {
                 actionInProgress: GameAutomationAction.NONE
             };
             obsStore.obsState.currentScene = 'Gameplay Scene';
-            obsStore.obsState.gameplayScene = 'Gameplay Scene';
+            obsStore.obsConfig[0].gameplayScene = 'Gameplay Scene';
             wrapper = mount(MatchManager);
         });
 
@@ -170,7 +180,7 @@ describe('MatchManager', () => {
                 actionInProgress: GameAutomationAction.NONE
             };
             obsStore.obsState.currentScene = 'another scene';
-            obsStore.obsState.gameplayScene = 'Gameplay Scene';
+            obsStore.obsConfig[0].gameplayScene = 'Gameplay Scene';
             wrapper = mount(MatchManager);
         });
 
@@ -225,8 +235,8 @@ describe('MatchManager', () => {
 
     it('shows warning if obs scene configuration is changed', async () => {
         const obsStore = useObsStore();
-        obsStore.obsState.gameplayScene = 'Gameplay Scene';
-        obsStore.obsState.intermissionScene = 'Intermission Scene';
+        obsStore.obsConfig[0].gameplayScene = 'Gameplay Scene';
+        obsStore.obsConfig[0].intermissionScene = 'Intermission Scene';
         const wrapper = mount(MatchManager);
 
         messageListeners.obsSceneConfigurationChangedAfterUpdate();

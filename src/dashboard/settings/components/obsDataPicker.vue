@@ -50,11 +50,11 @@ export default defineComponent({
         const intermissionScene = ref('');
 
         watch(
-            () => obsStore.obsState.gameplayScene,
+            () => obsStore.currentSceneConfig.gameplayScene,
             scene => gameplayScene.value = scene,
             { immediate: true });
         watch(
-            () => obsStore.obsState.intermissionScene,
+            () => obsStore.currentSceneConfig.intermissionScene,
             scene => intermissionScene.value = scene,
             { immediate: true });
 
@@ -66,10 +66,10 @@ export default defineComponent({
             sceneOptions: computed(() => obsStore.obsState.scenes?.map(scene =>
                 ({ value: scene, name: scene })) ?? []),
             isChanged: computed(() =>
-                gameplayScene.value !== obsStore.obsState.gameplayScene
-                || intermissionScene.value !== obsStore.obsState.intermissionScene),
-            update() {
-                obsStore.setData({
+                gameplayScene.value !== obsStore.currentSceneConfig.gameplayScene
+                || intermissionScene.value !== obsStore.currentSceneConfig.intermissionScene),
+            async update() {
+                await obsStore.setData({
                     gameplayScene: gameplayScene.value,
                     intermissionScene: intermissionScene.value
                 });
@@ -77,8 +77,8 @@ export default defineComponent({
             undoChanges(event: Event) {
                 event.preventDefault();
 
-                gameplayScene.value = obsStore.obsState.gameplayScene;
-                intermissionScene.value = obsStore.obsState.intermissionScene;
+                gameplayScene.value = obsStore.currentSceneConfig.gameplayScene;
+                intermissionScene.value = obsStore.currentSceneConfig.intermissionScene;
             }
         };
     }

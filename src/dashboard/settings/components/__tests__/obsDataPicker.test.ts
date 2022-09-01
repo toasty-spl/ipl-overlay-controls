@@ -18,12 +18,18 @@ describe('ObsDataPicker', () => {
 
         const obsStore = useObsStore();
         obsStore.obsCredentials = null;
+        obsStore.obsConfig = [
+            {
+                sceneCollection: 'scenes',
+                gameplayScene: 'Scene One',
+                intermissionScene: 'Scene Two'
+            }
+        ];
         obsStore.obsState = {
             enabled: true,
             status: ObsStatus.CONNECTED,
             scenes: ['Scene One', 'Scene Two', 'Scene Three'],
-            gameplayScene: 'Scene One',
-            intermissionScene: 'Scene Two'
+            currentSceneCollection: 'scenes'
         };
     });
 

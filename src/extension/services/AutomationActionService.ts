@@ -79,7 +79,8 @@ export class AutomationActionService {
                         name: 'changeScene',
                         action: async () => {
                             switchToNextColor();
-                            await this.obsConnectorService.setCurrentScene(this.obsState.value.gameplayScene);
+                            await this.obsConnectorService.setCurrentScene(
+                                this.obsConnectorService.getCurrentSceneConfig().gameplayScene);
                         }
                     },
                     {
@@ -110,7 +111,8 @@ export class AutomationActionService {
                         timeout: endTimings[gameVersion].changeScene,
                         name: 'changeScene',
                         action: async () => {
-                            await this.obsConnectorService.setCurrentScene(this.obsState.value.intermissionScene);
+                            await this.obsConnectorService.setCurrentScene(
+                                this.obsConnectorService.getCurrentSceneConfig().intermissionScene);
                         }
                     }
                 ];

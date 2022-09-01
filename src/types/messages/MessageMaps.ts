@@ -1,9 +1,9 @@
 import { ObsCredentials } from '../schemas';
-import { SetObsDataRequest } from './obs';
+import { SetObsConfigRequest } from './obs';
 
 export interface MessageInputMap {
     connectToObs: ObsCredentials
-    setObsData: SetObsDataRequest
+    setObsConfig: SetObsConfigRequest
     setObsSocketEnabled: boolean
 
     startGame: never
