@@ -5,6 +5,7 @@
         "caster": {
             "type": "object",
             "additionalProperties": false,
+            "required": ["name", "twitter", "pronouns"],
             "properties": {
                 "name": {
                     "type": "string"
@@ -13,6 +14,9 @@
                     "type": "string"
                 },
                 "pronouns": {
+                    "type": "string"
+                },
+                "imageUrl": {
                     "type": "string"
                 }
             }
